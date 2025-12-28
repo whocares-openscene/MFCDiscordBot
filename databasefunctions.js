@@ -72,18 +72,3 @@ export async function updatetime(modelid, time, channel) {
     await db.updateAsync({ id: modelid, channel: channel }, { $set: { time: time } }, { multi: false })
 }
 
-//const docs = await db.findAsync({})
-//addmodel(29845158, "The Commander of Mayhem", "@here the Commander of Mayhem is online at <https://mfc.im/MollyMayhemx>", "731500517473124422",false, "731500346383532073");
-//addmodel(41776362, "RiverMoonX", "@here River is online at <https://mfc.im/RiverMoonX>", "731500517473124422",false, "731500346383532073");
-//addmodel(35440548,"LunaWolfie","LunaWolfie","1174446406723969165",true,"731500346383532073");
-
-//updatemodel(35440548,"LunaWolfie","LunaWolfie2","1174446406723969165",true,"731500346383532073");
-
-//deletemodel(35440548, "731500346383532073");
-//deletemodel(1)
-//updatemodel(1, "Molly2", "None")
-//const newdocs = await db.findAsync({})
-
-//console.log(docs);
-//console.log(newdocs);
-
