@@ -26,8 +26,3 @@ export async function getmodelid(modelname) {
     }
     //console.log(result[1]);
 }
-
-//gettopic(45140757);
-//gettopic(29845158);
-
-//getmodelid('Schatze_Blake');
