@@ -25,7 +25,7 @@ async function handleInteraction(interaction) {
         await updatemodel.execute(interaction);
     } else if (interaction.commandName === "removemodel") {
         await removemodel.execute(interaction);
-        await removeinterval(interaction.options.getString('modelid'), interaction.options.getChannel('channel').id);
+        //await removeinterval(interaction.options.getString('modelid'), interaction.options.getChannel('channel').id);
     } else if (interaction.commandName === "getmodelid") {
         await getmodelid.execute(interaction);
     } else if (interaction.commandName === "listmodels") {
