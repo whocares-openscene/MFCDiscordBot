@@ -20,6 +20,7 @@ async function handleInteraction(interaction) {
     if (!interaction.isCommand()) return;
     if (interaction.commandName === 'addmodel') {
         await addmodel.execute(interaction);
+        await onlinecheck();
     } else if (interaction.commandName === "updatemodel") {
         await updatemodel.execute(interaction);
     } else if (interaction.commandName === "removemodel") {
@@ -50,7 +51,7 @@ client.once(Events.ClientReady, readyDiscord);
 client.login(process.env.TOKEN);
 
 async function readyDiscord() {
-    console.log('💖');
+    console.log('💖 v2');
     const models = await getmodels();
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
@@ -63,12 +64,13 @@ async function readyDiscord() {
 client.on(Events.InteractionCreate, handleInteraction);
 
 async function onlinecheck() {
-    //console.log("Online")
+    console.log("Online")
     const models = await getmodels();
+    const skipstatus = [1,12,13,14];
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
-        const currenttopic = await webstuff.gettopic(element['id']);
-        if (!currenttopic && element['topic'] != false) {
+        const modelstatus = await webstuff.getstatus(element['id']);
+        if (modelstatus['status'] === 1 && element['topic'] != false) { //Offline
             const channel = client.channels.cache.get(element['channel']);
             const ts = Date.now() - element['time'];
             var time = new Date(ts);
@@ -76,7 +78,35 @@ async function onlinecheck() {
             await channel.send(message);
             await dbfunctions.updatetime(element['id'], false, element['channel']);
             await dbfunctions.updatetopic(element['id'], false, element['channel']);
-        } else if (currenttopic && element['topic'] == false) {
+        } else if(modelstatus['status'] === 13 && element['topic'] != 13) { // Group
+            const channel = client.channels.cache.get(element['channel']);
+            const message = element['modelname'] + " is now in a group show!";
+            await channel.send(message);
+            await dbfunctions.updatetopic(element['id'], modelstatus['status'], element['channel']);
+        } else if(modelstatus['status'] === 14 && element['topic'] != 14) { // Club
+            const channel = client.channels.cache.get(element['channel']);
+            const message = element['modelname'] + " is now in a club show!";
+            await channel.send(message);
+            await dbfunctions.updatetopic(element['id'], modelstatus['status'], element['channel']);
+        } else if ((Number.isInteger(element['topic']) || element['topic'] === false) && !skipstatus.includes(modelstatus['status'])) { // 
+            const channel = client.channels.cache.get(element['channel']);
+            const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['topic'];
+            await channel.send(message);
+            await dbfunctions.updatetopic(element['id'], modelstatus['topic'], element['channel']);
+        } else if (modelstatus['status'] === 1 && element['time'] != false) { // offline
+            const channel = client.channels.cache.get(element['channel']);
+            const ts = Date.now() - element['time'];
+            var time = new Date(ts);
+            const message = element['modelname'] + " has gone offline while the bot was offline.";
+            await channel.send(message);
+            await dbfunctions.updatetime(element['id'], false, element['channel']);
+            await dbfunctions.updatetopic(element['id'], false, element['channel']);
+        }
+        
+        /*
+        
+        
+        else if (modelstatus['status'] && element['topic'] == false) {
             const channel = client.channels.cache.get(element['channel']);
             const message = element['message'] + "\nCurrent topic is:\n" + currenttopic;
             //await channel.send(element['message']);
@@ -103,8 +133,17 @@ async function onlinecheck() {
             await dbfunctions.updatetime(element['id'], false, element['channel']);
             await dbfunctions.updatetopic(element['id'], false), element['channel'];
         }
+        */
     }
 }
+
+
+
+/*
+13 - group
+0 - online
+12 - private
+14 - club
 
 async function topicchange(modelid, channel) {
     //console.log("Topic");
@@ -128,11 +167,16 @@ async function topicchange(modelid, channel) {
         console.log("Change fail " + modelid + ", " + channel);
     }
 }
+     */
 
 async function removeinterval(modelid, channel) {
-    const interval = await intervaldatabase.getinterval(modelid, channel);
-    clearInterval(interval);
-    await intervaldatabase.deleteinterval(modelid, channel);
+    try {
+        const interval = await intervaldatabase.getinterval(modelid, channel);
+        clearInterval(interval);
+        await intervaldatabase.deleteinterval(modelid, channel);
+    } catch (error) {
+        console.log("Interval fail");
+    }
 }
 
 
