@@ -64,7 +64,7 @@ async function readyDiscord() {
 client.on(Events.InteractionCreate, handleInteraction);
 
 async function onlinecheck() {
-    console.log("Online")
+    //console.log("Online")
     const models = await getmodels();
     const skipstatus = [1,12,13,14];
     for (let index = 0; index < models.length; index++) {
