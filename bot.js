@@ -97,6 +97,8 @@ async function onlinecheck() {
                 files: [image]
             });
             await dbfunctions.updatetopic(element['id'], modelstatus['topic'], element['channel']);
+            const time = Date.now();
+            await dbfunctions.updatetime(element['id'], time, element['channel']);
             deleteFile(image);
             
         } else if (modelstatus['status'] === 1 && element['time'] != false) { // offline
