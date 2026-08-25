@@ -93,10 +93,10 @@ export async function getstatus(modelid) {
             //console.log("Online");
             let status = body['result']['user']['sessions'][0];
             //console.log("modelstatus");
-            modelstatus['status'] = status['vstate'];
             if (status['vidserver_id'] == 0) {
                 return modelstatus;
             }
+            modelstatus['status'] = status['vstate'];
             modelstatus['topic'] = status['room_topic'];
             modelstatus['username'] = body['result']['user']['username'];
             //console.log(modelstatus);
