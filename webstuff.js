@@ -1,6 +1,8 @@
 import fetch from 'node-fetch';
 import { title } from 'process';
 import * as cheerio from 'cheerio';
+import axios from 'axios';
+import fs from 'fs';
 
 const options = {
   method: 'GET',
@@ -38,6 +40,33 @@ export async function getmodelid(modelname) {
     }
     ////console.log(result[1]);
 }
+
+export async function getPicture(modelid) {
+    const ts = Date.now();
+    const location = import.meta.dirname + '/' + modelid + '.jpg';
+    const server = await getstatus(modelid);
+    var url = "https://snap.mfcimg.com/999999999/1787717215/NjhmYzEyMDI5NDZhMmQy/" + server['server'] + "/853x480/mfc_1" + modelid + "?no-cache=" + ts;
+    await downloadImage(url, location);
+    return location;
+}
+
+async function downloadImage(url, filepath) {
+  const response = await axios({
+    url,
+    method: 'GET',
+    responseType: 'stream'
+  });
+
+  return new Promise((resolve, reject) => {
+    const writer = fs.createWriteStream(filepath);
+    response.data.pipe(writer);
+    
+    writer.on('finish', resolve);
+    writer.on('error', reject);
+  });
+}
+
+
 /*
 export async function getCalendar(modelname) {
     var url = "https://share.myfreecams.com/" + modelname + "/calendar?list_view=true";
@@ -74,7 +103,8 @@ export async function getstatus(modelid) {
     const modelstatus = {
         status: 1,
         topic: "",
-        username: ""
+        username: "",
+        server: ''
     }
     //console.log(modelstatus);
     try {
@@ -96,6 +126,8 @@ export async function getstatus(modelid) {
             if (status['vidserver_id'] == 0) {
                 return modelstatus;
             }
+            //console.log(status['server_name'].match(/(\d+)/)[0]);
+            modelstatus['server'] = status['server_name'].match(/(\d)+./)[0];
             modelstatus['status'] = status['vstate'];
             modelstatus['topic'] = status['room_topic'];
             modelstatus['username'] = body['result']['user']['username'];

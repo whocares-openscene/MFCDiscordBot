@@ -87,9 +87,15 @@ async function onlinecheck() {
             await channel.send(message);
             await dbfunctions.updatetopic(element['id'], modelstatus['status'], element['channel']);
         } else if ((Number.isInteger(element['topic']) || element['topic'] === false) && !skipstatus.includes(modelstatus['status'])) { // 
+            const image = await webstuff.getPicture(element['id']);
             const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['topic'];
-            await channel.send(message);
+            
+            await channel.send({ 
+                content: message, 
+                files: [image]
+            });
             await dbfunctions.updatetopic(element['id'], modelstatus['topic'], element['channel']);
+            
         } else if (modelstatus['status'] === 1 && element['time'] != false) { // offline
             const ts = Date.now() - element['time'];
             var time = new Date(ts);
