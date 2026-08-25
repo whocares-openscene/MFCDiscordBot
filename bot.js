@@ -8,6 +8,8 @@ import * as getmodelid from './commands/getmodelid.js';
 import * as webstuff from './webstuff.js';
 import * as listmodels from './commands/listmodels.js';
 import * as intervaldatabase from './intervaldatabase.js';
+import { unlink } from 'node:fs/promises';
+
 
 config();
 
@@ -89,12 +91,13 @@ async function onlinecheck() {
         } else if ((Number.isInteger(element['topic']) || element['topic'] === false) && !skipstatus.includes(modelstatus['status'])) { // 
             const image = await webstuff.getPicture(element['id']);
             const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['topic'];
-            
+
             await channel.send({ 
                 content: message, 
                 files: [image]
             });
             await dbfunctions.updatetopic(element['id'], modelstatus['topic'], element['channel']);
+            deleteFile(image);
             
         } else if (modelstatus['status'] === 1 && element['time'] != false) { // offline
             const ts = Date.now() - element['time'];
@@ -191,6 +194,15 @@ async function removeinterval(modelid, channel) {
     } catch (error) {
         console.log("Interval fail");
     }
+}
+
+async function deleteFile(filepath) {
+  try {
+    await unlink(filepath);
+    console.log('File deleted successfully');
+  } catch (error) {
+    console.error('Error deleting file:', error.message);
+  }
 }
 
 
