@@ -199,7 +199,6 @@ async function removeinterval(modelid, channel) {
 async function deleteFile(filepath) {
   try {
     await unlink(filepath);
-    console.log('File deleted successfully');
   } catch (error) {
     console.error('Error deleting file:', error.message);
   }

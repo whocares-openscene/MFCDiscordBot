@@ -45,7 +45,7 @@ export async function getPicture(modelid) {
     const ts = Date.now();
     const location = import.meta.dirname + '/' + modelid + '.jpg';
     const server = await getstatus(modelid);
-    var url = "https://snap.mfcimg.com/999999999/1787717215/NjhmYzEyMDI5NDZhMmQy/" + server['server'] + "/853x480/mfc_1" + modelid + "?no-cache=" + ts;
+    var url = "https://snap.mfcimg.com/snapimg/" + server['server'] + "/341x192/mfc_1" + modelid;
     await downloadImage(url, location);
     return location;
 }
