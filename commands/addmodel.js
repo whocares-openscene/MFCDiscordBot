@@ -26,6 +26,10 @@ export const data = new SlashCommandBuilder()
         option.setName('update')
             .setDescription('Time between updated topic announcements in minutes. Use 0 for no announcements. Must be more then 5')
             .setRequired(true))
+    .addBooleanOption((option) =>
+		option.setName('events')
+            .setDescription('Should events from the MFCShare calendar be added to Discord')
+            .setRequired(true))
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
 
@@ -36,7 +40,8 @@ export async function execute(interaction) {
     const message = interaction.options.getString('message');
     const channel = interaction.options.getChannel('channel').id;
     const update = interaction.options.getString('update');
-    db.addmodel(modelid, model, message, channel, update);
+    const events = interaction.options.getBoolean('events');
+    db.addmodel(modelid, model, message, channel, update, events);
     //await interaction.reply(interaction.options.getChannel('channel'))
     await interaction.reply({content: "Model " + model + " was added with the message: " + message, ephemeral: true});
 }

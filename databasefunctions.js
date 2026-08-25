@@ -2,7 +2,7 @@ import Datastore from '@seald-io/nedb';
 
 const db = new Datastore({ filename: 'mfcbot.db', autoload: true });
 
-export async function addmodel(modelid, modelname, message, channel, update) {
+export async function addmodel(modelid, modelname, message, channel, update, events) {
     const model = {
         id: modelid,
         modelname: modelname,
@@ -10,7 +10,8 @@ export async function addmodel(modelid, modelname, message, channel, update) {
         time: false,
         channel: channel,
         update: update,
-        topic: false
+        topic: false,
+        events: events
     }
     try {
         const insertmodel = await db.insertAsync(model)
@@ -28,7 +29,7 @@ export async function deletemodel(modelid, channel) {
     }
 }
 
-export async function updatemodel(modelid, modelname, message, channel, update) {
+export async function updatemodel(modelid, modelname, message, channel, update, events) {
     const model = {
         id: modelid,
         modelname: modelname,
@@ -36,13 +37,15 @@ export async function updatemodel(modelid, modelname, message, channel, update) 
         time: false,
         channel: channel,
         update: update,
-        topic: false
+        topic: false,
+        events: events
     }
+    console.log(model);
     try {
         const insertmodel = await db.updateAsync({id: modelid, channel: channel} , model);
         return insertmodel;
     } catch (error) {
-
+        console.log(error);
     }
 }
 

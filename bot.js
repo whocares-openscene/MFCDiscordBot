@@ -70,31 +70,27 @@ async function onlinecheck() {
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
         const modelstatus = await webstuff.getstatus(element['id']);
+        const channel = client.channels.cache.get(element['channel']);
         if (modelstatus['status'] === 1 && element['topic'] != false) { //Offline
-            const channel = client.channels.cache.get(element['channel']);
             const ts = Date.now() - element['time'];
             var time = new Date(ts);
             const message = element['modelname'] + " has gone offline. She was online for " + time.getUTCHours() + " hours " + time.getUTCMinutes() + " minutes and " + time.getUTCSeconds() + " seconds";
             await channel.send(message);
             await dbfunctions.updatetime(element['id'], false, element['channel']);
             await dbfunctions.updatetopic(element['id'], false, element['channel']);
-        } else if(modelstatus['status'] === 13 && element['topic'] != 13) { // Group
-            const channel = client.channels.cache.get(element['channel']);
+        } else if(modelstatus['status'] === 13 && element['topic'] != 13) { // Group            
             const message = element['modelname'] + " is now in a group show!";
             await channel.send(message);
             await dbfunctions.updatetopic(element['id'], modelstatus['status'], element['channel']);
         } else if(modelstatus['status'] === 14 && element['topic'] != 14) { // Club
-            const channel = client.channels.cache.get(element['channel']);
             const message = element['modelname'] + " is now in a club show!";
             await channel.send(message);
             await dbfunctions.updatetopic(element['id'], modelstatus['status'], element['channel']);
         } else if ((Number.isInteger(element['topic']) || element['topic'] === false) && !skipstatus.includes(modelstatus['status'])) { // 
-            const channel = client.channels.cache.get(element['channel']);
             const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['topic'];
             await channel.send(message);
             await dbfunctions.updatetopic(element['id'], modelstatus['topic'], element['channel']);
         } else if (modelstatus['status'] === 1 && element['time'] != false) { // offline
-            const channel = client.channels.cache.get(element['channel']);
             const ts = Date.now() - element['time'];
             var time = new Date(ts);
             const message = element['modelname'] + " has gone offline while the bot was offline.";
@@ -102,12 +98,16 @@ async function onlinecheck() {
             await dbfunctions.updatetime(element['id'], false, element['channel']);
             await dbfunctions.updatetopic(element['id'], false, element['channel']);
         }
-        
+        /*if (element['events'] == true) {
+            updateEvents(channel['guildId'], modelstatus['username']);
+        }*/
+
+
         /*
         
         
         else if (modelstatus['status'] && element['topic'] == false) {
-            const channel = client.channels.cache.get(element['channel']);
+            
             const message = element['message'] + "\nCurrent topic is:\n" + currenttopic;
             //await channel.send(element['message']);
             //await channel.send("Current topic is:");
@@ -125,7 +125,7 @@ async function onlinecheck() {
                 await intervaldatabase.addinterval(element['id'], element['channel'], intervalId);
             }
         } else if (!currenttopic && element['time'] != false) {
-            const channel = client.channels.cache.get(element['channel']);
+            
             const ts = Date.now() - element['time'];
             var time = new Date(ts);
             const message = element['modelname'] + " has gone offline while the bot was offline.";
@@ -136,8 +136,16 @@ async function onlinecheck() {
         */
     }
 }
+/*
+async function updateEvents(guildId, username) {
 
-
+    const events = await webstuff.getCalendar(guildId, username);
+    console.log(guildId + username);
+    console.log(events);
+    var time = "";
+    
+    
+}*/
 
 /*
 13 - group
