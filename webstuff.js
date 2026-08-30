@@ -115,7 +115,7 @@ export async function getstatus(modelid) {
             //console.log("offline");
             //console.log(body['result']['message'])
             //console.log(modelstatus);
-            console.log("1");
+            //console.log("1");
             return modelstatus;
         }
         

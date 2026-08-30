@@ -17,7 +17,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     const channel = interaction.options.getChannel('channel').id;
     const models = await db.getmodels();
-    console.log(models);
+    //console.log(models);
     let modelnames = "";
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
