@@ -1,6 +1,6 @@
 import sqlite3 from "sqlite3";
 
-const db = new sqlite3.Database('mfcbot.db');
+const db = new sqlite3.Database('mfcbot.db', sqlite3.OPEN_READWRITE);
 
 process.on('SIGINT', () => {
   db.close((err) => {
