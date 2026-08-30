@@ -1,4 +1,4 @@
 # MFCDiscordBot
 
 
-requires discord.js and @seald-io/nedb
+requires discord.js and sqlite3
