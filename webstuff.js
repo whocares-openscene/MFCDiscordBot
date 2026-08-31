@@ -28,12 +28,11 @@ export async function gettopic(modelid) {
 
 export async function getmodelid(modelname) {
     ////console.log("function");
-    var url = "https://share.myfreecams.com/" + modelname;
+    var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelname;
     try {
         const response = await fetch(url, options);
-        const body = await response.text();
-        let result = body.match(/tracking\.php\?model_id=(\d+)&/);
-        return result[1];
+        const body = await response.json();
+        return body['result']['user']['id'];
     } catch (error) {
         console.log(error);
         return "Lookup failed";
