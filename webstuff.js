@@ -32,6 +32,9 @@ export async function getmodelid(modelname) {
     try {
         const response = await fetch(url, options);
         const body = await response.json();
+        if (body['result']['success'] === 0) {
+            return "Lookup failed"
+        }
         return body['result']['user']['id'];
     } catch (error) {
         console.log(error);
