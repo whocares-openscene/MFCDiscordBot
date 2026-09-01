@@ -58,7 +58,7 @@ async function readyDiscord() {
         await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
     }
     //onlinecheck();
-    setInterval(onlinecheck, 60000);
+    setInterval(onlinecheck, 30000);
 }
 
 client.on(Events.InteractionCreate, handleInteraction);
