@@ -108,7 +108,7 @@ async function onlinecheck() {
             const message = element['modelname'] + " has gone offline. She was online for " + time.getUTCHours() + " hours " + time.getUTCMinutes() + " minutes and " + time.getUTCSeconds() + " seconds";
             await channel.send(message);
             await dbfunctions.updatetime(element['modelid'], false, element['channel']);
-            await dbfunctions.updatetopic(            console.log(modelstatus);element['modelid'], false, element['channel']);
+            await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
         }
         //const modelstatus = await webstuff.getstatus(element['modelid']);
         /*
