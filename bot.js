@@ -68,7 +68,7 @@ async function onlinecheck() {
     const models = await dbfunctions.getmodels();
     const skipstatus = [1,12,13,14];
     const allmodels = await webstuff.getallonline();
-    console.log(allmodels.length);
+    console.log(allmodels);
     for (let index = 0; index < models.length; index++) {
         console.log("Checking " + index);
         const element = models[index];
