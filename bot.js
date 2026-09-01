@@ -76,20 +76,20 @@ async function onlinecheck() {
         var time = new Date(ts);
         element['int'] = parseInt(element['topic']);
         if (Object.hasOwn(allmodels, name)) {
-            console.log("Found " + name);
             const modelstatus = allmodels[name];
+            console.log(modelstatus);
             if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
                 const message = element['modelname'] + " is now in a group show!";
                 await channel.send(message);
                 await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
             } else if(modelstatus['show_kind'] === 3 && element['topic'] != 3) { // Club
-            const message = element['modelname'] + " is now in a club show!";
-            await channel.send(message);
-            await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
+                const message = element['modelname'] + " is now in a club show!";
+                await channel.send(message);
+                await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
             } else if ((Number.isInteger(element['int']) || element['int'] === false) && !skipstatus.includes(modelstatus['show_kind'])  && modelstatus['topic'] != "") { 
+                console.log("online")
                 const image = await webstuff.getPicture(modelstatus['image_url'], element['modelid']);
                 const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['subject'];
-
                 await channel.send({ 
                     content: message, 
                     files: [image]
