@@ -165,7 +165,7 @@ export async function getallonline() {
         const count = Object.keys(body.streamers).length;
         if (count > 0) {
             console.log(count);
-            return body.streamers
+            return JSON.stringify(body.streamers)
         }
     } catch (error) {
         //console.log("Try Fail");
