@@ -76,7 +76,7 @@ async function onlinecheck() {
         var time = new Date(ts);
         element['int'] = parseInt(element['topic']);
         if (Object.hasOwn(allmodels, name)) {
-            console.log("Found");
+            console.log("Found " + name);
             const modelstatus = allmodels[name];
             if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
                 const message = element['modelname'] + " is now in a group show!";
