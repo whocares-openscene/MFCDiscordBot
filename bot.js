@@ -71,13 +71,13 @@ async function onlinecheck() {
     for (let index = 0; index < models.length; index++) {
         console.log("Checking " + index);
         const element = models[index];
-        const name = await webstuff.getmodelusername(element['modelid']);
+        const name = await webstuff.getmodelusername(element['modelid']).toLowerCase();
         console.log(name);
         const channel = client.channels.cache.get(element['channel']);
         const ts = Date.now() - element['time'];
         var time = new Date(ts);
         element['int'] = parseInt(element['topic']);
-        if (Object.hasOwn(allmodels, name.toLowerCase())) {
+        if (Object.hasOwn(allmodels, name)) {
             console.log("Found");
             const modelstatus = allmodels[name];
             if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
