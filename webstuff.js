@@ -161,16 +161,12 @@ export async function getallonline() {
     var url = "http://mfcgo/online";
     try {
         const response = await fetch(url);
-        const body = await response.json();
-        const subject = body['streamers']['a_tease']['subject'];
-        console.log("Subject:", subject);
-        
+        const body = await response.json();        
         const count = Object.keys(body.streamers).length;
         for (let index = 0; index < 6; index++) {
             console.log()
             
         }
-        console.log(body.streamers['MollyMayhem'])
         if (count > 0) {
             console.log(count);
             return body.streamers

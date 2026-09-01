@@ -68,7 +68,6 @@ async function onlinecheck() {
     const models = await dbfunctions.getmodels();
     const skipstatus = [1,12,13,14];
     const allmodels = await webstuff.getallonline();
-    console.log(typeof allmodels);
     for (let index = 0; index < models.length; index++) {
         console.log("Checking " + index);
         const element = models[index];
@@ -78,7 +77,7 @@ async function onlinecheck() {
         const ts = Date.now() - element['time'];
         var time = new Date(ts);
         element['int'] = parseInt(element['topic']);
-        if (Object.hasOwn(allmodels, name)) {
+        if (Object.hasOwn(allmodels, name.toLowerCase())) {
             console.log("Found");
             const modelstatus = allmodels[name];
             if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
