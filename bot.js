@@ -57,7 +57,7 @@ async function readyDiscord() {
         const element = models[index];
         await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
     }
-    onlinecheck();
+    //onlinecheck();
     setInterval(onlinecheck, 120000);
 }
 
