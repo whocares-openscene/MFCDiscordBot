@@ -26,7 +26,8 @@ export async function getmodelusername(modelid) {
         if (body['result']['success'] === 0) {
             return "Lookup failed"
         }
-        return body['result']['user']['username'];
+        const name = body['result']['user']['username'];
+        return name.toLowerCase();
     } catch (error) {
         console.log(error);
         return "Lookup failed";

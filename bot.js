@@ -69,10 +69,8 @@ async function onlinecheck() {
     const skipstatus = [1,12,13,14];
     const allmodels = await webstuff.getallonline();
     for (let index = 0; index < models.length; index++) {
-        console.log("Checking " + index);
         const element = models[index];
-        const name = await webstuff.getmodelusername(element['modelid'].toLowerCase());
-        console.log(name);
+        const name = await webstuff.getmodelusername(element['modelid']);
         const channel = client.channels.cache.get(element['channel']);
         const ts = Date.now() - element['time'];
         var time = new Date(ts);
