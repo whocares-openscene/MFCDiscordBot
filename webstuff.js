@@ -157,7 +157,7 @@ export async function getstatus(modelid) {
 }
 
 export async function getallonline() {
-    //console.log("running all online")
+    console.log("running all online")
     var url = "http://mfcgo/online";
     try {
         const response = await fetch(url);

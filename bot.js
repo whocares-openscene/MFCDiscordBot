@@ -71,6 +71,7 @@ async function onlinecheck() {
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
         const name = webstuff.getmodelusername(element['modelid']);
+        console.log("Checking " + name);
         const channel = client.channels.cache.get(element['channel']);
         const ts = Date.now() - element['time'];
         var time = new Date(ts);
