@@ -161,11 +161,11 @@ export async function getallonline() {
     var url = "http://mfcgo/online";
     try {
         const response = await fetch(url);
-        const body = await response.json();
+        const body = await JSON.parse(response);
         const count = Object.keys(body.streamers).length;
         if (count > 0) {
             console.log(count);
-            return JSON.stringify(body.streamers)
+            return body.streamers
         }
     } catch (error) {
         //console.log("Try Fail");
