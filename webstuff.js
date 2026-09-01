@@ -161,8 +161,9 @@ export async function getallonline() {
     var url = "http://mfcgo/online";
     try {
         const response = await fetch(url);
-        const body = await JSON.parse(response);
+        const body = await response.json();
         const count = Object.keys(body.streamers).length;
+        console.log(body.streamers.MolyMayhem)
         if (count > 0) {
             console.log(count);
             return body.streamers
