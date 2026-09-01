@@ -80,6 +80,7 @@ async function onlinecheck() {
         if (Object.hasOwn(allmodels, name)) {
             const modelstatus = allmodels[name];
             console.log(typeof modelstatus['topic']);
+            console.log(modelstatus['show_kind']);
             if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
                 const message = element['modelname'] + " is now in a group show!";
                 await channel.send(message);
@@ -88,7 +89,7 @@ async function onlinecheck() {
                 const message = element['modelname'] + " is now in a club show!";
                 await channel.send(message);
                 await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
-            } else if ((Number.isInteger(element['int']) || element['int'] === false) && modelstatus['show_kind'] === 1  && typeof modelstatus['topic'] != "undefined") {
+            } else if ((Number.isInteger(element['int']) || element['int'] === false) && modelstatus['show_kind'] === 1  && (typeof modelstatus['topic'] != "undefined")) {
                 
                 const image = await webstuff.getPicture(modelstatus['image_url'], element['modelid']);
                 const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['subject'];
