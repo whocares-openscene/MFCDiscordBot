@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits, SlashCommandRoleOption } from 'discord.js';
+import { Client, Events, GatewayIntentBits } from 'discord.js';
 import { config } from 'dotenv';
 import * as addmodel from './commands/addmodel.js';
 import * as updatemodel from './commands/updatemodel.js';
@@ -7,18 +7,16 @@ import * as dbfunctions from './databasefunctions.js';
 import * as getmodelid from './commands/getmodelid.js';
 import * as webstuff from './webstuff.js';
 import * as listmodels from './commands/listmodels.js';
-import * as intervaldatabase from './intervaldatabase.js';
 import { unlink } from 'node:fs/promises';
-import { all } from 'axios';
-
 
 config();
 
-// Create a new client instance
+// Create a new Discord client instance
 const client = new Client({
     intents: [GatewayIntentBits.Guilds],
 });
 
+// Handle interactions with the Discord client
 async function handleInteraction(interaction) {
     if (!interaction.isCommand()) return;
     if (interaction.commandName === 'addmodel') {
@@ -28,20 +26,11 @@ async function handleInteraction(interaction) {
         await updatemodel.execute(interaction);
     } else if (interaction.commandName === "removemodel") {
         await removemodel.execute(interaction);
-        //await removeinterval(interaction.options.getString('modelid'), interaction.options.getChannel('channel').id);
     } else if (interaction.commandName === "getmodelid") {
         await getmodelid.execute(interaction);
     } else if (interaction.commandName === "listmodels") {
         await listmodels.execute(interaction);
     }
-}
-
-
-async function sendmessage(channelid, message) {
-    //console.log(message);
-    var channel = client.channels.cache.get(channelid);
-    await channel.send(message);
-
 }
 
 // When the client is ready, run this code (only once)
@@ -51,7 +40,7 @@ client.once(Events.ClientReady, readyDiscord);
 client.login(process.env.TOKEN);
 
 async function readyDiscord() {
-    console.log('💖 v4.5');
+    console.log('💖 v5');
     const models = await dbfunctions.getmodels();
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
@@ -63,8 +52,8 @@ async function readyDiscord() {
 
 client.on(Events.InteractionCreate, handleInteraction);
 
+// Main function to check online status of models
 async function onlinecheck() {
-    //console.log("Online")
     const models = await dbfunctions.getmodels();
     const allmodels = await webstuff.getallonline();
     if (typeof allmodels == "undefined") {
@@ -78,21 +67,23 @@ async function onlinecheck() {
         var time = new Date(ts);
         element['int'] = parseInt(element['topic']);
         if (Object.hasOwn(allmodels, name)) {
-            const modelstatus = allmodels[name];
-            if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
+          const modelstatus = allmodels[name];
+          if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
+              // Group show
                 const message = element['modelname'] + " is now in a group show!";
                 await channel.send(message);
-                await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
-            } else if(modelstatus['show_kind'] === 3 && element['topic'] != 3) { // Club
+              await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
+            } else if (modelstatus['show_kind'] === 3 && element['topic'] != 3) {
+              // Club show
                 const message = element['modelname'] + " is now in a club show!";
                 await channel.send(message);
                 await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
             } else if ((Number.isInteger(element['int']) || element['int'] === false) && modelstatus['show_kind'] === 1  && (typeof modelstatus['subject'] != "undefined")) {
-                
+                // Public show
                 const image = await webstuff.getPicture(modelstatus['image_url'], element['modelid']);
                 const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['subject'];
-                await channel.send({ 
-                    content: message, 
+                await channel.send({
+                    content: message,
                     files: [image]
                 });
                 await dbfunctions.updatetopic(element['modelid'], modelstatus['subject'], element['channel']);
@@ -112,122 +103,7 @@ async function onlinecheck() {
             await channel.send(message);
             await dbfunctions.updatetime(element['modelid'], false, element['channel']);
             await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
-        } 
-        //const modelstatus = await webstuff.getstatus(element['modelid']);
-        /*
-        if(modelstatus['status'] === 13 && element['topic'] != 13) { // Group            
-            const message = element['modelname'] + " is now in a group show!";
-            await channel.send(message);
-            await dbfunctions.updatetopic(element['modelid'], modelstatus['status'], element['channel']);
-        } else if(modelstatus['status'] === 14 && element['topic'] != 14) { // Club
-            const message = element['modelname'] + " is now in a club show!";
-            await channel.send(message);
-            await dbfunctions.updatetopic(element['modelid'], modelstatus['status'], element['channel']);
-        } else if ((Number.isInteger(element['int']) || element['int'] === false) && !skipstatus.includes(modelstatus['status'])  && modelstatus['topic'] != "") { 
-            const image = await webstuff.getPicture(element['modelid']);
-            const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['topic'];
-
-            await channel.send({ 
-                content: message, 
-                files: [image]
-            });
-            await dbfunctions.updatetopic(element['modelid'], modelstatus['topic'], element['channel']);
-            const time = Date.now();
-            await dbfunctions.updatetime(element['modelid'], time, element['channel']);
-            deleteFile(image);
-            
-        } else if (modelstatus['status'] === 1 && element['time'] != false) { // offline
-            const ts = Date.now() - element['time'];
-            
         }
-        /*if (element['events'] == true) {
-            updateEvents(channel['guildId'], modelstatus['username']);
-        }*/
-
-
-        /*
-        
-        
-        else if (modelstatus['status'] && element['topic'] == false) {
-            
-            const message = element['message'] + "\nCurrent topic is:\n" + currenttopic;
-            //await channel.send(element['message']);
-            //await channel.send("Current topic is:");
-            //await channel.send(currenttopic);
-            await channel.send(message);
-            await dbfunctions.updatetopic(element['modelid'], currenttopic, element['channel']);
-            const time = Date.now();
-            await dbfunctions.updatetime(element['modelid'], time, element['channel']);
-            if (Number(element['update']) > 5) {
-                const time = Number(element['update']) * 60 * 1000
-                //console.log(time);
-                const interval = setInterval(topicchange, time, element['modelid'], element['channel']);
-                const intervalId = interval[Symbol.toPrimitive]();
-                //console.log(intervalId);
-                await intervaldatabase.addinterval(element['modelid'], element['channel'], intervalId);
-            }
-        } else if (!currenttopic && element['time'] != false) {
-            
-            const ts = Date.now() - element['time'];
-            var time = new Date(ts);
-            const message = element['modelname'] + " has gone offline while the bot was offline.";
-            await channel.send(message);
-            await dbfunctions.updatetime(element['modelid'], false, element['channel']);
-            await dbfunctions.updatetopic(element['modelid'], false), element['channel'];
-        }
-        */
-    }
-}
-/*
-async function updateEvents(guildId, username) {
-
-    const events = await webstuff.getCalendar(guildId, username);
-    console.log(guildId + username);
-    console.log(events);
-    var time = "";
-    
-    
-}*/
-
-/*
-13 - group
-0 - online
-12 - private
-14 - club
-
-async function topicchange(modelid, channel) {
-    //console.log("Topic");
-    //const interval = await intervaldatabase.getinterval(modelid, channel);
-    //console.log(interval);
-    const model = await dbfunctions.getmodel(modelid, channel);
-    const currenttopic = await webstuff.gettopic(modelid);
-    try {groupStatus.includes(modelstatus['show_kind']) && !groupStatus.includes(element['topic'])
-        if (model[0]['update'] === false) {
-            clearInterval(this)
-        } else if (!currenttopic) {
-            clearInterval(this);
-        } else if (currenttopic != model[0]['topic']) {
-            const channel = client.channels.cache.get(model[0]['channel']);
-            await channel.send("New topic for " + model[0]['modelname'] + "\n" + currenttopic);
-            //await channel.send(currenttopic);
-            dbfunctions.updatetopic(modelid, currenttopic, channel);
-        }   
-    } catch (error) {
-        clearInterval(this);
-        console.log("Change fail " + modelid + ", " + channel);
-    }
-}
-     */
-
-async function removeinterval(modelid, channel) {
-    try {
-        const interval = await intervaldatabase.getinterval(modelid, channel);
-        clearInterval(interval);
-        await intervaldatabase.deleteinterval(modelid, channel);
-    } catch (error) {
-        console.log("Interval fail");
-    }
-}
 
 async function deleteFile(filepath) {
   try {
@@ -256,6 +132,3 @@ const (
 	ShowAway ShowKind = 6
 )
     */
-
-
-//clearInterval(this);

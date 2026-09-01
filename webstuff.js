@@ -1,84 +1,82 @@
-import fetch from 'node-fetch';
-import { title } from 'process';
-import * as cheerio from 'cheerio';
-import axios from 'axios';
-import fs from 'fs';
+import fetch from "node-fetch";
+import axios from "axios";
+import fs from "fs";
 
-
+// Get the topic for a given model ID from the MyFreeCams API
+// No longer in use
 export async function gettopic(modelid) {
-    var url = "https://api-edge.myfreecams.com/recommend?model_id=" + modelid +  "&version2=1&=";
-    try {
-        const response = await fetch(url);
-        const body = await response.json();
-        return body['result']['users'][modelid]['room_topic'];    
-    } catch (error) {
-        console.log(error);
-        return false
-    }
+  var url =
+    "https://api-edge.myfreecams.com/recommend?model_id=${modelid}&version2=1&=";
+  try {
+    const response = await fetch(url);
+    const body = await response.json();
+    return body["result"]["users"][modelid]["room_topic"];
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 }
 
+// Get the username for a given model ID from the MyFreeCams API
 export async function getmodelusername(modelid) {
-    ////console.log("function");
-    var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelid;
-    try {
-        const response = await fetch(url);
-        const body = await response.json();
-        if (body['result']['success'] === 0) {
-            return "Lookup failed"
-        }
-        const name = body['result']['user']['username'];
-        return name.toLowerCase();
-    } catch (error) {
-        console.log(error);
-        return "Lookup failed";
+  var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelid;
+  try {
+    const response = await fetch(url);
+    const body = await response.json();
+    if (body["result"]["success"] === 0) {
+      return "Lookup failed";
     }
-    ////console.log(result[1]);
+    const name = body["result"]["user"]["username"];
+    return name.toLowerCase();
+  } catch (error) {
+    console.log(error);
+    return "Lookup failed";
+  }
 }
 
+// Get the model ID for a given model name from the MyFreeCams API
 export async function getmodelid(modelname) {
-    ////console.log("function");
-    var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelname;
-    try {
-        const response = await fetch(url);
-        const body = await response.json();
-        if (body['result']['success'] === 0) {
-            return "Lookup failed"
-        }
-        return body['result']['user']['id'];
-    } catch (error) {
-        console.log(error);
-        return "Lookup failed";
+  var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelname;
+  try {
+    const response = await fetch(url);
+    const body = await response.json();
+    if (body["result"]["success"] === 0) {
+      return "Lookup failed";
     }
-    ////console.log(result[1]);
+    return body["result"]["user"]["id"];
+  } catch (error) {
+    console.log(error);
+    return "Lookup failed";
+  }
 }
 
+// Get the live image for a model from MyFreeCams
 export async function getPicture(url, modelid) {
-    ///const ts = Date.now();
-    const location = import.meta.dirname + '/' + modelid + '.jpg';
-    ///const server = await getstatus(modelid);
-    ///var url = "https://snap.mfcimg.com/snapimg/" + server['server'] + "/341x192/mfc_1" + modelid;
-    await downloadImage(url, location);
-    return location;
+  const location = import.meta.dirname + "/${modelid}.jpg";
+  await downloadImage(url, location);
+  return location;
 }
 
+// Download an image from a URL and save it to a file
 async function downloadImage(url, filepath) {
   const response = await axios({
     url,
-    method: 'GET',
-    responseType: 'stream'
+    method: "GET",
+    responseType: "stream",
   });
 
   return new Promise((resolve, reject) => {
     const writer = fs.createWriteStream(filepath);
     response.data.pipe(writer);
-    
-    writer.on('finish', resolve);
-    writer.on('error', reject);
+
+    writer.on("finish", resolve);
+    writer.on("error", reject);
   });
 }
 
-
 /*
+// Attempt to get the calendar for a model from the MyFreeCams API
+// Failed due to too many requests
 export async function getCalendar(modelname) {
     var url = "https://share.myfreecams.com/" + modelname + "/calendar?list_view=true";
     try {
@@ -106,77 +104,58 @@ export async function getCalendar(modelname) {
 }
     */
 
+// Get status of a model from the MyFreeCams API
+// Not in use
 export async function getstatus(modelid) {
-
-    //console.log("Entered getstatus" + modelid);
-
-    var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelid;
-    const modelstatus = {
-        status: 1,
-        topic: "",
-        username: "",
-        server: ''
+  var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelid;
+  const modelstatus = {
+    status: 1,
+    topic: "",
+    username: "",
+    server: "",
+  };
+  try {
+    const response = await fetch(url);
+    const body = await response.json();
+    if (body["result"]["success"] === 0) {
+      return modelstatus;
     }
-    //console.log(modelstatus);
-    try {
-        const response = await fetch(url);
-        const body = await response.json();
-        //console.log("Try");
-        if (body['result']['success'] === 0) {
-            //console.log("o/home/joeln/MFCBot/MFCDiscordBotffline");
-            //console.log(body['result']['message'])
-            //console.log(modelstatus);
-            //console.log("1");
-            return modelstatus;
-        }
-        
-        if (0 in body['result']['user']['sessions']) {
-            //console.log("Online");
-            let status = body['result']['user']['sessions'][0];
-            //console.log("modelstatus");
-            if (status['vidserver_id'] == 0) {
-                return modelstatus;
-            }
-            //console.log(status['server_name'].match(/(\d+)/)[0]);
-            modelstatus['server'] = status['server_name'].match(/(\d)+./)[0];
-            modelstatus['status'] = status['vstate'];
-            modelstatus['topic'] = status['room_topic'];
-            modelstatus['username'] = body['result']['user']['username'];
-            //console.log(modelstatus);
-            return modelstatus;
-        } else {
-            modelstatus['username'] = body['result']['user']['username'];
-            return modelstatus;
-        }
 
-        ////console.log(body);
-    } catch (error) {
-        //console.log("Try Fail");
-        console.log(error);
+    if (0 in body["result"]["user"]["sessions"]) {
+      let status = body["result"]["user"]["sessions"][0];
+      if (status["vidserver_id"] == 0) {
         return modelstatus;
+      }
+      modelstatus["server"] = status["server_name"].match(/(\d)+./)[0];
+      modelstatus["status"] = status["vstate"];
+      modelstatus["topic"] = status["room_topic"];
+      modelstatus["username"] = body["result"]["user"]["username"];
+      return modelstatus;
+    } else {
+      modelstatus["username"] = body["result"]["user"]["username"];
+      return modelstatus;
     }
+  } catch (error) {
+    console.log(error);
+    return modelstatus;
+  }
 }
 
+// Get all online streamers from mfcgo docker container
 export async function getallonline() {
-    //console.log("running all online")
-    var url = "http://mfcgo/online";
-    try {
-        const response = await fetch(url);
-        const body = await response.json();        
-        const count = Object.keys(body.streamers).length;
-        if (count > 0) {
-            return body.streamers
-        }
-    } catch (error) {
-        //console.log("Try Fail");
-        console.log(error);
-        return;
+  var url = "http://mfcgo/online";
+  try {
+    const response = await fetch(url);
+    const body = await response.json();
+    const count = Object.keys(body.streamers).length;
+    if (count > 0) {
+      return body.streamers;
     }
-    
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 }
-
-
-
 
 /*
 13 - group
