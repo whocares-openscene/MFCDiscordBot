@@ -100,18 +100,19 @@ async function onlinecheck() {
                 await dbfunctions.updatetime(element['modelid'], time, element['channel']);
                 deleteFile(image);
             }
+        } else if (element['topic'] != false) {
+            //offline
+            const message = element['modelname'] + " has gone offline. She was online for " + time.getUTCHours() + " hours " + time.getUTCMinutes() + " minutes and " + time.getUTCSeconds() + " seconds";
+            await channel.send(message);
+            await dbfunctions.updatetime(element['modelid'], false, element['channel']);
+            await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
         } else if (element['time'] != false) {
             //offline while bot gone
             const message = element['modelname'] + " has gone offline while the bot was offline.";
             await channel.send(message);
             await dbfunctions.updatetime(element['modelid'], false, element['channel']);
             await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
-        } else if (element['topic'] != false) {
-            const message = element['modelname'] + " has gone offline. She was online for " + time.getUTCHours() + " hours " + time.getUTCMinutes() + " minutes and " + time.getUTCSeconds() + " seconds";
-            await channel.send(message);
-            await dbfunctions.updatetime(element['modelid'], false, element['channel']);
-            await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
-        }
+        } 
         //const modelstatus = await webstuff.getstatus(element['modelid']);
         /*
         if(modelstatus['status'] === 13 && element['topic'] != 13) { // Group            
