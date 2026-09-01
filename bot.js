@@ -9,6 +9,7 @@ import * as webstuff from './webstuff.js';
 import * as listmodels from './commands/listmodels.js';
 import * as intervaldatabase from './intervaldatabase.js';
 import { unlink } from 'node:fs/promises';
+import { all } from 'axios';
 
 
 config();
@@ -50,7 +51,7 @@ client.once(Events.ClientReady, readyDiscord);
 client.login(process.env.TOKEN);
 
 async function readyDiscord() {
-    console.log('💖 v3');
+    console.log('💖 v4');
     const models = await dbfunctions.getmodels();
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
@@ -66,20 +67,52 @@ async function onlinecheck() {
     //console.log("Online")
     const models = await dbfunctions.getmodels();
     const skipstatus = [1,12,13,14];
+    const allmodels = await webstuff.getallonline();
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
-        const modelstatus = await webstuff.getstatus(element['modelid']);
+        const name = webstuff.getmodelusername(element['modelid']);
         const channel = client.channels.cache.get(element['channel']);
         const ts = Date.now() - element['time'];
+        var time = new Date(ts);
         element['int'] = parseInt(element['topic']);
-        if (modelstatus['status'] === 1 && element['topic'] != false) { //Offline
-            const ts = Date.now() - element['time'];
-            var time = new Date(ts);
+        if (Object.hasOwn(allmodels, name)) {
+            const modelstatus = allmodels[name];
+            if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
+                const message = element['modelname'] + " is now in a group show!";
+                await channel.send(message);
+                await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
+            } else if(modelstatus['show_kind'] === 3 && element['topic'] != 3) { // Club
+            const message = element['modelname'] + " is now in a club show!";
+            await channel.send(message);
+            await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
+            } else if ((Number.isInteger(element['int']) || element['int'] === false) && !skipstatus.includes(modelstatus['show_kind'])  && modelstatus['topic'] != "") { 
+                const image = await webstuff.getPicture(modelstatus['image_url'], element['modelid']);
+                const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['subject'];
+
+                await channel.send({ 
+                    content: message, 
+                    files: [image]
+                });
+                await dbfunctions.updatetopic(element['modelid'], modelstatus['subject'], element['channel']);
+                const time = Date.now();
+                await dbfunctions.updatetime(element['modelid'], time, element['channel']);
+                deleteFile(image);
+            }
+        } else if (element['time'] != false) {
+            //offline while bot gone
+            const message = element['modelname'] + " has gone offline while the bot was offline.";
+            await channel.send(message);
+            await dbfunctions.updatetime(element['modelid'], false, element['channel']);
+            await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
+        } else if (element['topic'] != false) {
             const message = element['modelname'] + " has gone offline. She was online for " + time.getUTCHours() + " hours " + time.getUTCMinutes() + " minutes and " + time.getUTCSeconds() + " seconds";
             await channel.send(message);
             await dbfunctions.updatetime(element['modelid'], false, element['channel']);
             await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
-        } else if(modelstatus['status'] === 13 && element['topic'] != 13) { // Group            
+        }
+        //const modelstatus = await webstuff.getstatus(element['modelid']);
+        /*
+        if(modelstatus['status'] === 13 && element['topic'] != 13) { // Group            
             const message = element['modelname'] + " is now in a group show!";
             await channel.send(message);
             await dbfunctions.updatetopic(element['modelid'], modelstatus['status'], element['channel']);
@@ -102,11 +135,7 @@ async function onlinecheck() {
             
         } else if (modelstatus['status'] === 1 && element['time'] != false) { // offline
             const ts = Date.now() - element['time'];
-            var time = new Date(ts);
-            const message = element['modelname'] + " has gone offline while the bot was offline.";
-            await channel.send(message);
-            await dbfunctions.updatetime(element['modelid'], false, element['channel']);
-            await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
+            
         }
         /*if (element['events'] == true) {
             updateEvents(channel['guildId'], modelstatus['username']);
@@ -169,7 +198,7 @@ async function topicchange(modelid, channel) {
     //console.log(interval);
     const model = await dbfunctions.getmodel(modelid, channel);
     const currenttopic = await webstuff.gettopic(modelid);
-    try {
+    try {groupStatus.includes(modelstatus['show_kind']) && !groupStatus.includes(element['topic'])
         if (model[0]['update'] === false) {
             clearInterval(this)
         } else if (!currenttopic) {
@@ -205,8 +234,25 @@ async function deleteFile(filepath) {
   }
 }
 
-
-
+/*
+show_kind
+const (
+	// ShowUnknown means the show kind is unknown
+	ShowUnknown ShowKind = 0
+	// ShowPublic means the show is public
+	ShowPublic ShowKind = 1
+	// ShowGroup means the show is a group show
+	ShowGroup ShowKind = 2
+	// ShowTicket means the show is a ticket show
+	ShowTicket ShowKind = 3
+	// ShowHidden means the show is hidden
+	ShowHidden ShowKind = 4
+	// ShowPrivate means the show is private
+	ShowPrivate ShowKind = 5
+	// ShowAway means the model is away
+	ShowAway ShowKind = 6
+)
+    */
 
 
 //clearInterval(this);

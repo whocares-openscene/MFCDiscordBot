@@ -17,6 +17,23 @@ export async function gettopic(modelid) {
     }
 }
 
+export async function getmodelusername(modelid) {
+    ////console.log("function");
+    var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelid;
+    try {
+        const response = await fetch(url);
+        const body = await response.json();
+        if (body['result']['success'] === 0) {
+            return "Lookup failed"
+        }
+        return body['result']['user']['username'];
+    } catch (error) {
+        console.log(error);
+        return "Lookup failed";
+    }
+    ////console.log(result[1]);
+}
+
 export async function getmodelid(modelname) {
     ////console.log("function");
     var url = "https://api-edge.myfreecams.com/usernameLookup/" + modelname;
@@ -34,11 +51,11 @@ export async function getmodelid(modelname) {
     ////console.log(result[1]);
 }
 
-export async function getPicture(modelid) {
-    const ts = Date.now();
+export async function getPicture(url, modelid) {
+    ///const ts = Date.now();
     const location = import.meta.dirname + '/' + modelid + '.jpg';
-    const server = await getstatus(modelid);
-    var url = "https://snap.mfcimg.com/snapimg/" + server['server'] + "/341x192/mfc_1" + modelid;
+    ///const server = await getstatus(modelid);
+    ///var url = "https://snap.mfcimg.com/snapimg/" + server['server'] + "/341x192/mfc_1" + modelid;
     await downloadImage(url, location);
     return location;
 }
@@ -105,7 +122,7 @@ export async function getstatus(modelid) {
         const body = await response.json();
         //console.log("Try");
         if (body['result']['success'] === 0) {
-            //console.log("offline");
+            //console.log("o/home/joeln/MFCBot/MFCDiscordBotffline");
             //console.log(body['result']['message'])
             //console.log(modelstatus);
             //console.log("1");
@@ -137,6 +154,24 @@ export async function getstatus(modelid) {
         console.log(error);
         return modelstatus;
     }
+}
+
+export async function getallonline() {
+    //console.log("running all online")
+    var url = "http://mfcgo/online";
+    try {
+        const response = await fetch(url);
+        const body = await response.json();
+        const count = Object.keys(body.streamers).length;
+        if (count > 0) {
+            return body.streamers
+        }
+    } catch (error) {
+        //console.log("Try Fail");
+        console.log(error);
+        return;
+    }
+    
 }
 
 
