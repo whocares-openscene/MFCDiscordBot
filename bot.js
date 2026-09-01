@@ -51,14 +51,14 @@ client.once(Events.ClientReady, readyDiscord);
 client.login(process.env.TOKEN);
 
 async function readyDiscord() {
-    console.log('💖 v4');
+    console.log('💖 v4.5');
     const models = await dbfunctions.getmodels();
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
         await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
     }
-    //onlinecheck();
-    setInterval(onlinecheck, 30000);
+    onlinecheck();
+    setInterval(onlinecheck, 120000);
 }
 
 client.on(Events.InteractionCreate, handleInteraction);
@@ -66,8 +66,10 @@ client.on(Events.InteractionCreate, handleInteraction);
 async function onlinecheck() {
     //console.log("Online")
     const models = await dbfunctions.getmodels();
-    const skipstatus = [0,2,3,4,5,6];
     const allmodels = await webstuff.getallonline();
+    if (Object.keys(allmodels).length == 0) {
+        return
+    }
     for (let index = 0; index < models.length; index++) {
         const element = models[index];
         const name = await webstuff.getmodelusername(element['modelid']);
@@ -77,6 +79,7 @@ async function onlinecheck() {
         element['int'] = parseInt(element['topic']);
         if (Object.hasOwn(allmodels, name)) {
             const modelstatus = allmodels[name];
+            console.log(typeof modelstatus['topic']);
             if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
                 const message = element['modelname'] + " is now in a group show!";
                 await channel.send(message);
@@ -85,8 +88,8 @@ async function onlinecheck() {
                 const message = element['modelname'] + " is now in a club show!";
                 await channel.send(message);
                 await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
-            } else if ((Number.isInteger(element['int']) || element['int'] === false) && modelstatus['show_kind'] === 1  && typeof modelstatus['topic'] != "undefined") { 
-                console.log("online")
+            } else if ((Number.isInteger(element['int']) || element['int'] === false) && modelstatus['show_kind'] === 1  && typeof modelstatus['topic'] != "undefined") {
+                
                 const image = await webstuff.getPicture(modelstatus['image_url'], element['modelid']);
                 const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['subject'];
                 await channel.send({ 
