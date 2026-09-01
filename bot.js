@@ -58,7 +58,7 @@ async function readyDiscord() {
         await dbfunctions.updatetopic(element['modelid'], false, element['channel']);
     }
     //onlinecheck();
-    setInterval(onlinecheck, 120000);
+    setInterval(onlinecheck, 60000);
 }
 
 client.on(Events.InteractionCreate, handleInteraction);
@@ -68,9 +68,12 @@ async function onlinecheck() {
     const models = await dbfunctions.getmodels();
     const skipstatus = [1,12,13,14];
     const allmodels = await webstuff.getallonline();
+    console.log(allmodels.length);
     for (let index = 0; index < models.length; index++) {
+        console.log("Checking " + index);
         const element = models[index];
         const name = await webstuff.getmodelusername(element['modelid']);
+        console.log(name);
         const channel = client.channels.cache.get(element['channel']);
         const ts = Date.now() - element['time'];
         var time = new Date(ts);
@@ -78,7 +81,6 @@ async function onlinecheck() {
         if (Object.hasOwn(allmodels, name)) {
             console.log("Found");
             const modelstatus = allmodels[name];
-            console.log(modelstatus);
             if (modelstatus['show_kind'] === 2 && element['topic'] != 2) {
                 const message = element['modelname'] + " is now in a group show!";
                 await channel.send(message);
