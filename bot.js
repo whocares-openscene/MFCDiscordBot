@@ -86,7 +86,7 @@ async function onlinecheck() {
                 const message = element['modelname'] + " is now in a club show!";
                 await channel.send(message);
                 await dbfunctions.updatetopic(element['modelid'], modelstatus['show_kind'], element['channel']);
-            } else if ((Number.isInteger(element['int']) || element['int'] === false) && !skipstatus.includes(modelstatus['show_kind'])  && modelstatus['topic'] != "") { 
+            } else if ((Number.isInteger(element['int']) || element['int'] === false) && !skipstatus.includes(modelstatus['show_kind'])  && modelstatus['subject'] != "") { 
                 console.log("online")
                 const image = await webstuff.getPicture(modelstatus['image_url'], element['modelid']);
                 const message = element['message'] + "\nCurrent topic is:\n" + modelstatus['subject'];
