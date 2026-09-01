@@ -162,7 +162,14 @@ export async function getallonline() {
     try {
         const response = await fetch(url);
         const body = await response.json();
+        const subject = body['streamers']['MollyMayhem']['subject'];
+        console.log("Subject:", subject);
+        
         const count = Object.keys(body.streamers).length;
+        for (let index = 0; index < 6; index++) {
+            console.log()
+            
+        }
         console.log(body.streamers['MollyMayhem'])
         if (count > 0) {
             console.log(count);
