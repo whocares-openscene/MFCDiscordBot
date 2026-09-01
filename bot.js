@@ -112,23 +112,3 @@ async function deleteFile(filepath) {
     console.error('Error deleting file:', error.message);
   }
 }
-
-/*
-show_kind
-const (
-	// ShowUnknown means the show kind is unknown
-	ShowUnknown ShowKind = 0
-	// ShowPublic means the show is public
-	ShowPublic ShowKind = 1
-	// ShowGroup means the show is a group show
-	ShowGroup ShowKind = 2
-	// ShowTicket means the show is a ticket show
-	ShowTicket ShowKind = 3
-	// ShowHidden means the show is hidden
-	ShowHidden ShowKind = 4
-	// ShowPrivate means the show is private
-	ShowPrivate ShowKind = 5
-	// ShowAway means the model is away
-	ShowAway ShowKind = 6
-)
-    */

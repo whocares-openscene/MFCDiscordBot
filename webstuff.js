@@ -156,14 +156,3 @@ export async function getallonline() {
     return;
   }
 }
-
-/*
-13 - group
-0 - online
-12 - private
-14 - club
-
-
-https://api-edge.myfreecams.com/usernameLookup/mollymayhem
-
-*/
