@@ -71,7 +71,7 @@ async function onlinecheck() {
     for (let index = 0; index < models.length; index++) {
         console.log("Checking " + index);
         const element = models[index];
-        const name = await webstuff.getmodelusername(element['modelid']).toLowerCase();
+        const name = await webstuff.getmodelusername(element['modelid'].toLowerCase());
         console.log(name);
         const channel = client.channels.cache.get(element['channel']);
         const ts = Date.now() - element['time'];
