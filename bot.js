@@ -67,7 +67,7 @@ async function onlinecheck() {
     //console.log("Online")
     const models = await dbfunctions.getmodels();
     const allmodels = await webstuff.getallonline();
-    if (Object.keys(allmodels).length == 0) {
+    if (typeof allmodels == "undefined");
         return
     }
     for (let index = 0; index < models.length; index++) {
