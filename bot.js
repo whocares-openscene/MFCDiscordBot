@@ -72,6 +72,10 @@ async function onlinecheck() {
     element["int"] = parseInt(element["topic"]);
     if (Object.hasOwn(allmodels, name)) {
       const modelstatus = allmodels[name];
+      console.log(Number.isInteger(element["int"]));
+      console.log(element["int"]);
+      console.log(modelstatus["show_kind"]);
+      console.log(typeof modelstatus["subject"]);
       if (modelstatus["show_kind"] === 2 && element["topic"] != 2) {
         // Group show
         const message = element["modelname"] + " is now in a group show!";
