@@ -30,9 +30,10 @@ COPY --from=builder /app/mfcbot /app/mfcbot
 # Expose HTTP endpoints
 EXPOSE 80
 
-# Healthcheck
+# Healthcheck: check the HTTP API when LISTEN_ADDRESS is set; otherwise the
+# bot runs headless, so simply require the process to be alive.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD wget -qO- http://localhost/healthz >/dev/null || exit 1
+    CMD ["sh", "-c", "if [ -z \"$LISTEN_ADDRESS\" ]; then exit 0; fi; port=${LISTEN_ADDRESS##*:}; wget -qO- \"http://localhost:$port/healthz\" >/dev/null || exit 1"]
 
 # Entrypoint
 ENTRYPOINT ["./mfcbot"]

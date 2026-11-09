@@ -46,7 +46,7 @@ func Load() *Config {
 	return &Config{
 		Token:                  getEnv("TOKEN", ""),
 		ClientID:               getEnv("CLIENTID", ""),
-		ListenAddress:          getEnv("LISTEN_ADDRESS", "0.0.0.0:80"),
+		ListenAddress:          getEnv("LISTEN_ADDRESS", ""),
 		TimeoutSeconds:         getEnvInt("TIMEOUT_SECONDS", 10),
 		MaxSnapshotSize:        getEnvInt("MAX_SNAPSHOT_SIZE", 20000),
 		WSConnectTimeout:       getEnvDuration("WS_CONNECT_TIMEOUT", 30*time.Second),

@@ -36,7 +36,11 @@ Or with Docker:
 
 ```bash
 docker build -t mfcbot .
-docker run --env-file .env -p 80:80 -v "$PWD/mfcbot.db:/app/mfcbot.db" mfcbot
+# Headless (no HTTP listener):
+docker run --env-file .env -v "$PWD/mfcbot.db:/app/mfcbot.db" mfcbot
+# With the HTTP API:
+docker run --env-file .env -e LISTEN_ADDRESS=0.0.0.0:80 -p 80:80 \
+    -v "$PWD/mfcbot.db:/app/mfcbot.db" mfcbot
 ```
 
 ## Running
@@ -45,8 +49,9 @@ docker run --env-file .env -p 80:80 -v "$PWD/mfcbot.db:/app/mfcbot.db" mfcbot
 ./mfcbot
 ```
 
-The process starts the HTTP server, connects to MFC, connects to Discord,
-registers the slash commands, and then waits for `SIGINT`/`SIGTERM`.
+The process connects to MFC, connects to Discord, registers the slash
+commands, and then waits for `SIGINT`/`SIGTERM`. The HTTP server is only
+started when `LISTEN_ADDRESS` is set; everything else works headless.
 
 ### Running without Docker
 
@@ -73,6 +78,9 @@ A typical bare-metal layout is:
 └── mfcbot.db     # watch list (created if missing; copy an existing one to keep it)
 ```
 
+To expose the HTTP API, add `LISTEN_ADDRESS` to `.env` (for example
+`LISTEN_ADDRESS=127.0.0.1:3000`). Leave it out to run without any open port.
+
 The source tree (`cmd/`, `internal/`, `go.mod`, `go.sum`) is only needed to
 build the binary. `legacy-node/`, `example.env` and `Dockerfile` are not
 needed at runtime.
@@ -91,7 +99,7 @@ environment variables:
 | --- | --- | --- |
 | `TOKEN` | — | Discord bot token (required) |
 | `CLIENTID` | — | Discord application id (informational) |
-| `LISTEN_ADDRESS` | `0.0.0.0:80` | HTTP listen address |
+| `LISTEN_ADDRESS` | unset | HTTP listen address. When unset, no port is bound and the HTTP API is disabled. |
 | `DATABASE_PATH` | `mfcbot.db` | SQLite database path |
 | `ONLINE_CHECK_INTERVAL` | `2m` | How often to compare models with the snapshot |
 | `TIMEOUT_SECONDS` | `10` | HTTP client timeout |
@@ -107,6 +115,10 @@ environment variables:
 | `TRACE` | `false` | Trace logging |
 
 ## HTTP API
+
+These endpoints are available only when `LISTEN_ADDRESS` is set (for example
+`LISTEN_ADDRESS=0.0.0.0:80` or `LISTEN_ADDRESS=:3000`). Without it the bot
+runs headless and none of the endpoints are served.
 
 | Endpoint | Description |
 | --- | --- |

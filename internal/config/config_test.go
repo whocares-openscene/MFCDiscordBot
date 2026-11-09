@@ -52,3 +52,17 @@ func TestLoadDotEnvMissingFileIsIgnored(t *testing.T) {
 	// Must not panic or block when no .env exists.
 	loadDotEnv(filepath.Join(t.TempDir(), "does-not-exist"))
 }
+
+func TestListenAddressDefaultsToDisabled(t *testing.T) {
+	t.Setenv("LISTEN_ADDRESS", "")
+	if got := Load().ListenAddress; got != "" {
+		t.Fatalf("ListenAddress = %q, want empty (HTTP disabled)", got)
+	}
+}
+
+func TestListenAddressFromEnvironment(t *testing.T) {
+	t.Setenv("LISTEN_ADDRESS", "127.0.0.1:9090")
+	if got := Load().ListenAddress; got != "127.0.0.1:9090" {
+		t.Fatalf("ListenAddress = %q, want 127.0.0.1:9090", got)
+	}
+}

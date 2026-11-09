@@ -83,24 +83,29 @@ func (a *Adapter) LookupModelID(ctx context.Context, name string) (int, error) {
 	return *reply.update.UID, nil
 }
 
-// Start launches the HTTP server and the background websocket workers.
+// Start launches the HTTP server (when LISTEN_ADDRESS is set) and the
+// background websocket workers. A listener is optional: the Discord bot and
+// MFC monitor work without it, so an empty ListenAddress runs headless.
 func (a *Adapter) Start(parentCtx context.Context) error {
 	ctx, cancel := context.WithCancel(parentCtx)
 	a.cancel = cancel
 
-	a.srv = &http.Server{
-		Addr:         a.cfg.ListenAddress,
-		Handler:      a.buildMux(),
-		ReadTimeout:  httpReadTimeout,
-		WriteTimeout: httpWriteTimeout,
-	}
-
 	// Bind synchronously so a bad address or busy port surfaces from Start
 	// instead of leaving the bot running without its HTTP API.
-	ln, err := net.Listen("tcp", a.cfg.ListenAddress)
-	if err != nil {
-		cancel()
-		return err
+	var ln net.Listener
+	if a.cfg.ListenAddress != "" {
+		a.srv = &http.Server{
+			Addr:         a.cfg.ListenAddress,
+			Handler:      a.buildMux(),
+			ReadTimeout:  httpReadTimeout,
+			WriteTimeout: httpWriteTimeout,
+		}
+		var err error
+		ln, err = net.Listen("tcp", a.cfg.ListenAddress)
+		if err != nil {
+			cancel()
+			return err
+		}
 	}
 
 	var wg sync.WaitGroup
@@ -113,6 +118,12 @@ func (a *Adapter) Start(parentCtx context.Context) error {
 	go func() { defer wg.Done(); runNameCachePruner(ctx, a.state, a.cfg) }()
 	wg.Add(1)
 	go func() { defer wg.Done(); runVideoHostsRefresher(ctx, a.state, a.cfg, a.client) }()
+
+	if ln == nil {
+		log.Printf("HTTP server disabled (LISTEN_ADDRESS is not set)")
+		return nil
+	}
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()

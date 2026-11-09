@@ -143,3 +143,24 @@ func TestGetOnlineEmptyBeforeBulk(t *testing.T) {
 		t.Fatalf("LookupModelID error = %v, want errNoSession", err)
 	}
 }
+
+func TestStartHeadlessWhenListenAddressEmpty(t *testing.T) {
+	adapter := NewAdapter(&config.Config{MaxSnapshotSize: 10})
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // workers exit immediately without touching the network
+	if err := adapter.Start(ctx); err != nil {
+		t.Fatalf("Start headless: %v", err)
+	}
+	adapter.Stop()
+}
+
+func TestStartInvalidListenAddress(t *testing.T) {
+	adapter := NewAdapter(&config.Config{
+		MaxSnapshotSize: 10,
+		ListenAddress:   "not a valid address",
+	})
+	if err := adapter.Start(context.Background()); err == nil {
+		t.Fatal("Start with an invalid address should fail")
+	}
+	adapter.Stop()
+}
