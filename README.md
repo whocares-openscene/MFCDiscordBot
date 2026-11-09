@@ -48,9 +48,43 @@ docker run --env-file .env -p 80:80 -v "$PWD/mfcbot.db:/app/mfcbot.db" mfcbot
 The process starts the HTTP server, connects to MFC, connects to Discord,
 registers the slash commands, and then waits for `SIGINT`/`SIGTERM`.
 
+### Running without Docker
+
+Only the compiled binary is needed. From a directory containing `mfcbot`:
+
+```bash
+./mfcbot
+```
+
+At minimum the process needs:
+
+- the `mfcbot` binary
+- a writable directory for `mfcbot.db` (created automatically if absent)
+- a `.env` file **or** `TOKEN` in the environment
+- system CA certificates so HTTPS calls to MFC and Discord can be verified
+  (`ca-certificates` on Debian/Ubuntu/Alpine)
+
+A typical bare-metal layout is:
+
+```
+/opt/mfcbot/
+├── mfcbot        # compiled binary
+├── .env          # TOKEN=... (loaded automatically when present)
+└── mfcbot.db     # watch list (created if missing; copy an existing one to keep it)
+```
+
+The source tree (`cmd/`, `internal/`, `go.mod`, `go.sum`) is only needed to
+build the binary. `legacy-node/`, `example.env` and `Dockerfile` are not
+needed at runtime.
+
+To run under systemd, use `WorkingDirectory=/opt/mfcbot` and either keep the
+`.env` file there or set variables with `EnvironmentFile=`.
+
 ## Configuration
 
-Copy `example.env` to `.env` and fill in `TOKEN`. Configuration is read from
+Copy `example.env` to `.env` and fill in `TOKEN`. When `.env` is present in
+the working directory it is loaded automatically; real environment variables
+take precedence over values in the file. Configuration is read from
 environment variables:
 
 | Variable | Default | Description |
