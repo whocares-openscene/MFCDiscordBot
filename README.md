@@ -105,7 +105,7 @@ stores `""`, `"2"` (group), `"3"` (club), or `"Public"`.
 
 ## Legacy files
 
-The original Node.js implementation (`bot.js`, `commands/`, `webstuff.js`,
-`databasefunctions.js`, `deploy-commands.js`, `package.json`) is kept in the
-repository for reference but is no longer used or built. The Go bot is the
-single supported implementation.
+The original Node.js implementation has been moved to `legacy-node/` and is
+kept for reference only. It is no longer used or built; the Go bot in
+`cmd/mfcbot` is the single supported implementation. See
+`legacy-node/README.md` for the archived file list.
