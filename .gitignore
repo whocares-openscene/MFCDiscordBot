@@ -142,3 +142,6 @@ vite.config.ts.timestamp-*
 *.jpg
 seed.js
 mfcbot.db
+
+# Go build output
+/mfcbot
